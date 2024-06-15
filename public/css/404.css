@@ -1,0 +1,64 @@
+body {
+    margin: 0px;
+    padding: 0px;
+}
+
+.conttainer {
+    padding: 10px;
+}
+
+/*-------------------navigation bar ---------------------------*/
+.container-fluid {
+    background-color: white;
+}
+
+#img {
+    width: 200px;
+    height: 50px
+}
+
+#navbarNav ul li a {
+    color: black;
+
+}
+
+
+/*------------------holding the image--------------------------*/
+.img{
+    background-image: url("../images/404.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    max-width: 1000px;
+    margin: auto;
+    border-radius: 10px;
+    height: 600px;
+    margin-top: 100px;
+}
+/*--------------second section--------------------*/
+.second{
+    max-width: 1000px;
+    margin: auto;
+    margin-top: 100px;
+}
+
+.second h1{
+    color: var(--Neutral-800, #070707);
+    text-align: center;
+    font-family: Plus Jakarta Sans;
+    font-size: 70px;
+    font-style: normal;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.second p{
+    color: var(--Neutral-800, #070707);
+text-align: center;
+font-feature-settings: 'clig' off, 'liga' off;
+font-family: Plus Jakarta Sans;
+font-size: 18px;
+font-style: normal;
+font-weight: 400;
+opacity: 0.8;
+}

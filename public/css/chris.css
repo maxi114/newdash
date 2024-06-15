@@ -1,0 +1,366 @@
+body {
+    margin: 0px;
+    padding: 0px
+}
+
+.conttainer {
+    padding: 10px;
+}
+
+/*-------------------navigation bar ---------------------------*/
+
+.container-fluid {
+    background-color: white;
+}
+
+#img {
+    width: 200px;
+    height: 50px
+}
+
+#navbarNav ul li a {
+    color: black;
+
+}
+
+/*--------------------------div holding the agents name ---------------------------------*/
+.titlee {
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.titlee h1 {
+    color: var(--Neutral-800, #070707);
+    text-align: center;
+    font-family: Plus Jakarta Sans;
+    font-size: 70px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 116%;
+    /* 81.2px */
+    text-transform: capitalize;
+}
+
+.titlee p {
+    color: var(--Neutral-800, #070707);
+    text-align: center;
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Plus Jakarta Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+/*------------------------bootstrap card holding the agents information-----------------------------------*/
+#img555 {
+    background-image: url("../images/chris.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 700px;
+    border-radius: 10px;
+}
+
+.card-txt {
+    color: var(--Neutral-800, #070707);
+    font-family: Plus Jakarta Sans;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.card-title {
+    color: var(--Neutral-800, #070707);
+    font-family: Plus Jakarta Sans;
+    font-size: 48px;
+    font-style: italic;
+    font-weight: 200;
+    line-height: normal;
+}
+
+.card-text{
+    color: var(--Neutral-800, #070707);
+font-family: Plus Jakarta Sans;
+font-size: 20px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; 
+opacity: 0.7;
+}
+
+.btnn {
+    position: relative;
+    height: 30px;
+    margin-top: 30px;
+}
+
+.imgp {
+    position: absolute;
+    left: 0;
+    background-image: url("../images/Phone.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 20px;
+    height: 20px;
+}
+
+.aa {
+    position: absolute;
+    margin-left: 30px;
+    text-decoration: none;
+    color: var(--Neutral-800, #070707);
+    font-family: Plus Jakarta Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    /* 18px */
+}
+
+.btnn2 {
+    position: relative;
+    height: 30px;
+}
+
+.imgp2 {
+    position: absolute;
+    left: 0;
+    background-image: url("../images/Email.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 20px;
+    height: 15px;
+    margin-top: 5px;
+}
+
+/*--------------------------------------footer------------------------------------------*/
+footer {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    background-color: black;
+    padding-top: 100px;
+    margin-top: 200px;
+}
+
+/*left side of the footer*/
+.footerleft {
+    width: 350px;
+    margin: 0px;
+    margin-left: 50px;
+}
+
+.footerlogo {
+    background-image: url("../images/logo.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 200px;
+    height: 40px;
+
+}
+
+.footerleft p {
+    color: var(--Neutral-100, #FFF);
+    font-family: Plus Jakarta Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    margin-top: 40px;
+}
+
+/*right side of the footer*/
+.footerright {
+    width: 500px;
+    position: absolute;
+    right: 20px;
+    top: 70px;
+    display: flex;
+    flex-flow: wrap;
+    justify-content: left;
+}
+
+.footermenu {
+    width: 200px;
+}
+
+.footermenu h2 {
+    color: var(--Neutral-100, #ffffff);
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Plus Jakarta Sans;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.footermenu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.footermenu ul li a {
+    color: var(--Neutral-100, #dcdbdb);
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Plus Jakarta Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.footersocials {
+    width: 200px;
+    height: 300px;
+}
+
+.footersocials h3 {
+    color: var(--Neutral-100, #FFF);
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Plus Jakarta Sans;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.footer3 {
+    border-top: solid 1px rgba(255, 255, 255, .5);
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    padding-top: 20px;
+}
+
+.footer3 p {
+    color: var(--Neutral-100, #FFF);
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Plus Jakarta Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+}
+
+.footer3 p a {
+    color: var(--Primary-Color, #F15A29);
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Plus Jakarta Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    text-decoration-line: underline;
+}
+/*---------for screens less than 600px --------------------*/
+@media screen and (max-width: 600px) {
+
+    #img {
+        width: 150px;
+        height: 40px;
+    }
+
+    #nav {
+        max-width: 100vw;
+        padding: 10px;
+    }
+
+    .conttainer {
+        max-width: 500px;
+        margin: auto;
+    }
+
+    .titlee h1{
+        font-size: 50px;
+    }
+
+    .immm{
+        margin-top: 50px;
+    }
+    
+    .img09{
+        margin: 0px;
+        max-width: 350px;
+        margin: auto;
+    }
+    #img555{
+        height: 400px;
+    }
+      /*--------footer-------------*/
+      footer {
+        margin-top: 50px;
+        padding: 10px;
+        height: fit-content;
+        overflow: hidden;
+    }
+
+    .footerleft {
+        margin: 0px;
+    }
+
+    .fooerlogo {
+        width: 100px;
+    }
+
+    .footerright {
+        position: relative;
+        width: 300px;
+        overflow: hidden;
+        right: 0px;
+        left: 0px;
+        top: 30px;
+    }
+
+    .footermenu {
+        margin-bottom: 30px;
+    }
+
+    .footer3 {
+        position: relative;
+        margin: 0px;
+        margin: auto;
+    }
+}
+
+/*-footer--------*/
+@media screen and (max-width:950px) {
+
+    /*--------footer-------------*/
+    footer {
+        margin-top: 50px;
+        padding: 10px;
+        height: fit-content;
+        overflow: hidden;
+    }
+
+    .footerleft {
+        margin: 0px;
+    }
+
+    .fooerlogo {
+        width: 100px;
+    }
+
+    .footerright {
+        position: relative;
+        width: 300px;
+        overflow: hidden;
+        right: 0px;
+        left: 0px;
+        top: 30px;
+    }
+
+    .footermenu {
+        margin-bottom: 30px;
+    }
+
+    .footer3 {
+        position: relative;
+        margin: 0px;
+        margin: auto;
+    }
+}
