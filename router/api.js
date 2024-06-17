@@ -80,10 +80,12 @@ router.post("/login", (req, res) => {
   //check to see if the user already exists
   User.find({ Email: email })
   .then((data)=>{
+
     if(data.length == 0){
         res.send("user does not exists")
     }
-    else{
+    
+    if(data.length !== 0){
         if (bcrypt.compareSync(req.body.password, data[0].Password)) {
             const token = jwt.sign({
                 data: data[0]
@@ -96,5 +98,18 @@ router.post("/login", (req, res) => {
     }
   })
 });
+
+//verification of tokens 
+router.post('/verify', function (request, response) {
+  if (!request.body.token) {
+      return response.status(400).send('No token has been provided')
+  }
+  jwt.verify(request.body.token, process.env.secret, function (err, decoded) {
+      if (err) {
+          return response.status(400).send('Error with token')
+      }
+      return response.status(200).send(decoded);
+  })
+})
 
 module.exports = router;

@@ -65,11 +65,6 @@ const PropertySchema = new Schema({
         required: true,
     },
 
-    //land sqft
-    LandSqft:{
-        type: Number,
-        required: true,
-    },
 
     //Listing description
     ListingDescription:{
