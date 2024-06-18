@@ -82,48 +82,7 @@ body {
     margin-left: 5px;
 }
 
-/*------------------------filter------------------------------*/
-.filter {
-    border: solid 1px #F3F3F3;
-    background: var(--Neutral-200, #F3F3F3);
-    border-radius: 10px;
-    display: flex;
-    flex-flow: wrap;
-    justify-content: center;
-    max-width: 1500px;
-    margin: auto;
-}
 
-.pfil {
-    border-radius: 12px;
-    border: 1px solid var(--Neutral-400, #ACACAC);
-    width: 216px;
-    height: 72px;
-    background-color: white;
-    margin: 20px;
-}
-
-#Property {
-    outline: none;
-    border: none;
-    margin-left: 40px;
-    color: var(--Neutral-800, #070707);
-    opacity: 0.50;
-    font-family: Plus Jakarta Sans;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    width: 150px;
-    height: 100%;
-}
-
-#icon {
-    position: absolute;
-    margin-top: 22px;
-    margin-left: 10px;
-    width: 25px;
-    height: 25px;
-}
 
 /*---------------------div holding the properties section---------------------------------------*/
 .propertiess {
@@ -176,36 +135,56 @@ body {
     font-size: 15px;
 }
 
+#idem{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
+}
 .card-link {
-    width: 120px;
+    width: 100px;
     height: 35px;
-    position: relative;
     background-color: #F3F3F3;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-evenly;
+    transition: transform 0.3s ease;
+}
+
+.card-link:hover{
+    transform: scale(1.1);
+}
+
+.crdde{
+    background-color: red;
+    transition: transform 0.3s ease;
+}
+
+.crdde3 p{
+    color: #F15A29;
+}
+
+.crdde p{
+    color: white;
 }
 
 .linkimg {
     width: 20px;
     height: 20px;
-    position: absolute;
-    top: 5px;
-    left: 5px;
 }
 
-.linkimg1 {
-    left: 40px;
-}
+
 
 .linktxt {
+    height: 15px;
     color: var(--Neutral-800, #070707);
     font-family: Plus Jakarta Sans;
     font-size: 20px;
     font-style: italic;
     font-weight: 500;
-    margin-left: 20px;
-}
-
-.linktxt1 {
-    margin-left: 55px
 }
 
 /*-------subscribe to the news letter section*--------*/

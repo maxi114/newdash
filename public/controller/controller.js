@@ -132,7 +132,7 @@
 
   //function to post the properties
 
-  const propertiess = (response) => {
+  const propertiess = (response, $http) => {
     const data = response.data;
 
     //array to store images
@@ -205,23 +205,18 @@
           '<div class="line3"></div>' +
           "<br>" +
           ' <div class="card-body row align-items-center" id = "idem" style = "margin-left: 3px" >' +
-          '<div class="card-link" style=" margin-right: 30px">' +
-          '<img src="./images/sqftimg.png" class = "linkimg" alt="" srcset="">' +
-          '<p class = "linktxt"> ' +
-          data[i].dataaa.BuildingSqft +
-          " sqft </p>" +
+          
+          '<div class="card-link crdde3" style=" margin-right: 30px">' +
+          '<p class = "linktxt previ"> Preview </p>' +
           "</div>" +
-          '<div class="card-link" style=" margin-right: 30px">' +
-          '<img src="./images/bermimg.png" class = "linkimg linkimg1" alt="" srcset="">' +
-          '<p class = "linktxt linktxt1"> ' +
-          data[i].dataaa.Bathrooms +
-          " </p>" +
+          ' <div class="card-body row align-items-center" id = "idem" style = "margin-left: 3px" >' +
+          
+          '<div class="card-link crdde" style=" margin-right: 30px">' +
+          '<p class = "linktxt dele"> Delete </p>' +
           "</div>" +
-          '<div class="card-link">' +
-          '<img src="./images/bahroomimg.png" class = "linkimg linkimg1" alt="" srcset="">' +
-          '<p class = "linktxt linktxt1"> ' +
-          data[i].dataaa.Bedrooms +
-          " </p>" +
+          '<div class="card-link " id="edi>' +
+          '<img src="./images/edit.png" class = "linkimg linkimg1" alt="" srcset="">' +
+          '<p class = "linktxt editt"> Edit </p>' +
           "</div>" +
           "</div>" +
           "</div>" +
@@ -233,12 +228,28 @@
     }
 
     //when user clicks the properties
-    $(".card-body").click(function () {
-      var pr = $(this).parents("div")[0].id;
-
-      //redirect user to the properties page
+    $(".previ").click(function () {
+      var pr = $(this).parents("div")[3].id;
       location.href = "propertty/" + pr;
     });
+
+    //when user clicks delete
+    $(".dele").click(function (){
+      var pr = $(this).parents("div")[4].id;
+      $http.post("/post/delete",{
+        id: pr
+      }).then((res) => {
+       console.log(res.data)
+      });
+     
+    })
+
+    //when user clicks edit
+    $(".editt").click(function (){
+      var pr = $(this).parents("div")[4].id;
+      console.log(pr)
+    })
+    
   };
 
   //signlogin controller
@@ -500,7 +511,7 @@
               $(".hld").remove();
               $("#nod").hide();
               //showcase the properties
-              propertiess(response);
+              propertiess(response, $http);
             }
           });
       } else {
@@ -519,7 +530,7 @@
               $(".hld").remove();
               $("#nod").hide();
               //showcase the properties
-              propertiess(response);
+              propertiess(response, $http);
             }
           });
       }
@@ -550,7 +561,7 @@
               $(".hld").remove();
               $("#nod").hide();
               //showcase the properties
-              propertiess(response);
+              propertiess(response, $http);
             }
           });
       } else {
@@ -569,7 +580,7 @@
               $(".hld").remove();
               $("#nod").hide();
               //showcase the properties
-              propertiess(response);
+              propertiess(response, $http);
             }
           });
       }
@@ -585,7 +596,7 @@
           $(".spinner-border").hide();
           $(".hld").remove();
           //showcase the properties
-          propertiess(response);
+          propertiess(response, $http);
         } else {
           $(".hld").remove();
           $("#nod").show();

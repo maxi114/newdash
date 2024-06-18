@@ -33,6 +33,52 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+//delete route
+router.post("/delete", (req, res) => {
+  
+   //function to delete the uploaded files
+  const delfile = (data) => {
+    //loop through the uploaded files path
+    for (var i = 0; i < data.length; i++) {
+      const absolutePath = path.join(__dirname, 'public/images', data[i].Path);
+      fs.unlink("public/" + data[i].Path, (err) => {
+        if(err){
+          res.send(err)
+        }
+        else{
+          //delte data from the database
+          Image.deleteMany({ Email: data[0].Email, PropertyTile: data[0].Title })
+          .then(()=>{
+             //delete the listing from the databse
+             Property.deleteOne({ _id: req.body.id })
+             res.send("done")
+          })
+        }
+      });
+    }
+  }
+
+  //find the clicked property
+  Property.find({ _id: req.body.id })
+    .then((data) => {
+      if (data && data.length > 0) {
+        //find images with the same email and title
+        Image.find({ Email: data[0].Email, PropertyTile: data[0].Title }).then(
+          (data) => {
+              //delte the file path 
+              delfile(data)
+          }
+        );
+      } else {
+        res.send("nothing");
+      }
+    })
+    .catch((error) => {
+      // Handle any errors that occurred during the findOne operation
+      res.send("nothing");
+    });
+});
+
 //route to get the property thats clicked by the user
 router.post("/propertty", (req, res) => {
   //array to store the data and images path
