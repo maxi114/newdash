@@ -2,27 +2,36 @@
   //define the controller and set the
   const app = angular.module("app", ["ngRoute", "angular-jwt"]);
 
-   //prevent user from login into restricted pages without a valid token
-   app.run(function ($http, $rootScope, $window, $location, jwtHelper) {
-    $http.defaults.headers.common.Authorization = 'Bearer ' + $window.localStorage.token;
-    $rootScope.$on('$routeChangeStart', function (event, nextRoute, currentRoute) {
-        if (nextRoute.access !== undefined && nextRoute.access.restricted === true && !window.localStorage.token) {
-            event.preventDefault();
-            $location.path('/');
+  //prevent user from login into restricted pages without a valid token
+  app.run(function ($http, $rootScope, $window, $location, jwtHelper) {
+    $http.defaults.headers.common.Authorization =
+      "Bearer " + $window.localStorage.token;
+    $rootScope.$on(
+      "$routeChangeStart",
+      function (event, nextRoute, currentRoute) {
+        if (
+          nextRoute.access !== undefined &&
+          nextRoute.access.restricted === true &&
+          !window.localStorage.token
+        ) {
+          event.preventDefault();
+          $location.path("/");
         }
-        if ($window.localStorage.token && nextRoute.access.restricted === true) {
-            $http.post('/api/verify', { token: $window.localStorage.token })
-                .then(function (response) {
-
-                }, function (err) {
-                    delete $window.localStorage.token;
-                    $location.path('/');
-                })
+        if (
+          $window.localStorage.token &&
+          nextRoute.access.restricted === true
+        ) {
+          $http.post("/api/verify", { token: $window.localStorage.token }).then(
+            function (response) {},
+            function (err) {
+              delete $window.localStorage.token;
+              $location.path("/");
+            }
+          );
         }
-
-
-    })
-});
+      }
+    );
+  });
 
   //include cross domains
   app.config(function ($routeProvider, $locationProvider) {
@@ -48,8 +57,8 @@
       controller: "PostController",
       controllerAs: "vm",
       access: {
-        restricted: true
-    }
+        restricted: true,
+      },
     });
 
     //properties page
@@ -57,6 +66,9 @@
       templateUrl: "./property.html",
       controller: "PropertyController",
       controllerAs: "vm",
+      access: {
+        restricted: true,
+      },
     });
 
     //property page
@@ -64,6 +76,16 @@
       templateUrl: "./propertty.html",
       controller: "ProperttyController",
       controllerAs: "vm",
+    });
+
+    //edit page
+    $routeProvider.when("/edit/:token", {
+      templateUrl: "./edit.html",
+      controller: "EditController",
+      controllerAs: "vm",
+      access: {
+        restricted: true,
+      },
     });
 
     //our agents page
@@ -205,12 +227,10 @@
           '<div class="line3"></div>' +
           "<br>" +
           ' <div class="card-body row align-items-center" id = "idem" style = "margin-left: 3px" >' +
-          
           '<div class="card-link crdde3" style=" margin-right: 30px">' +
           '<p class = "linktxt previ"> Preview </p>' +
           "</div>" +
           ' <div class="card-body row align-items-center" id = "idem" style = "margin-left: 3px" >' +
-          
           '<div class="card-link crdde" style=" margin-right: 30px">' +
           '<p class = "linktxt dele"> Delete </p>' +
           "</div>" +
@@ -234,22 +254,22 @@
     });
 
     //when user clicks delete
-    $(".dele").click(function (){
+    $(".dele").click(function () {
       var pr = $(this).parents("div")[4].id;
-      $http.post("/post/delete",{
-        id: pr
-      }).then((res) => {
-       console.log(res.data)
-      });
-     
-    })
+      $http
+        .post("/post/delete", {
+          id: pr,
+        })
+        .then((res) => {
+          console.log(res);
+        });
+    });
 
     //when user clicks edit
-    $(".editt").click(function (){
+    $(".editt").click(function () {
       var pr = $(this).parents("div")[4].id;
-      console.log(pr)
-    })
-    
+      location.href = "edit/" + pr;
+    });
   };
 
   //signlogin controller
@@ -309,6 +329,397 @@
           $location.path("/post");
         }
       });
+    });
+  }
+
+  //Edit controller
+  app.controller("EditController", EditController);
+  function EditController($location, $scope, $window, $http) {
+    var vm = this;
+
+    //retrive token from the url
+    const url = window.location.pathname.split("/");
+    const url2 = url[2];
+
+    //route to retrieve the property
+    $http
+      .post("/post/propertty", {
+        id: url2,
+      })
+      .then((res) => {
+        var dt = res.data[0];
+        var am = res.data[0].dataaa.Amenities;
+        var pic = res.data[0].filepath;
+
+        vm.property = dt
+        vm.amenities = am
+       
+        //var array to store the images
+        var myFiles = [];
+
+        //display the images
+        //preview pictures before uploading
+        if (window.File && window.FileList && window.FileReader) {
+          //loop throuth the images
+          async function processImages() {
+            for (var p = 0; p < pic.length; p++) {
+                //hide the videos may take longer to load text
+                $("#imgt").hide();
+        
+                //split contentytpe
+                var pic2 = pic[p].split("/");
+                var pic23 = pic2[1].split(".");
+                var pic33 = pic2[1];
+        
+                async function getImageFileFromUrl(url) {
+                    let response = await fetch(url);
+                    let data = await response.blob();
+                    let metadata = {
+                        type: "image/" + pic23[1],
+                    };
+                    var file = new File([data], pic33, metadata);
+                    myFiles.push(file);
+                }
+        
+                // Await the asynchronous function to ensure it completes before continuing
+                await getImageFileFromUrl(pic[p]);
+        
+                $(
+                    '<div class="imgpreview">' +
+                    '<img id="img" src="' +
+                    pic[p] +
+                    '" title="' +
+                    pic33 +
+                    '"/>' +
+                    '<br/><a class="remove">x</a>' +
+                    "</div>"
+                ).appendTo(".images");
+        
+                $(".remove").click(function () {
+                    $(this).parent("div").remove();
+                    var name = $(this).parents("div")[0].children[0].title;
+        
+                    for (var i = 0; i < myFiles.length; i++) {
+                        if (myFiles[i].name == name) {
+                            myFiles.splice(i, 1);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Call the async function
+        processImages();
+        
+
+          $("#file").on("change", function (e) {
+            var files = e.target.files,
+              filesLength = files.length;
+            for (var i = 0; i < filesLength; i++) {
+              var f = files[i];
+
+              if (files[i].type.includes("image")) {
+                myFiles.push(f);
+              } else {
+                //alert
+                alert("Upload images only. Video uploads not supported .");
+                return;
+              }
+
+              //if there is a video show the loading circle
+              /*if (f.type.includes("video")) {
+                            //show the div holding the loading circle
+                            document.querySelector('.iver').style.display = 'flex';
+                        }*/
+
+              (function (file) {
+                var fileReader = new FileReader();
+                fileReader.onload = function (e) {
+                  //to acces the file name and file typre of the files
+                  var filename = file.name;
+                  var filetype = file.type;
+
+                  //image file
+                  if (filetype.includes("image")) {
+                    //hide the videos may take longer to load text
+                    $("#imgt").hide();
+
+                    $(
+                      '<div class="imgpreview">' +
+                        '<img id="img" src="' +
+                        e.target.result +
+                        '" title="' +
+                        filename +
+                        '"/>' +
+                        '<br/><a class="remove">x</a>' +
+                        "</div>"
+                    ).appendTo(".images");
+                  }
+
+                  $(".remove").click(function () {
+                    $(this).parent("div").remove();
+                    var name = $(this).parents("div")[0].children[0].title;
+
+                    for (var i = 0; i < myFiles.length; i++) {
+                      if (myFiles[i].name == name) {
+                        myFiles.splice(i, 1);
+                      }
+                    }
+                  });
+                };
+
+                fileReader.readAsDataURL(f);
+              })(files[i]);
+            }
+          });
+
+        } else {
+          alert("Your browser doesn't support to File API");
+        }
+
+        
+        //display the title
+        $("#title").val(dt.dataaa.Title);
+        vm.property.Title = dt.dataaa.Title
+
+        //display the property type
+        $("#PropertyType").val(dt.dataaa.PropertyType);
+        vm.property.PropertyType = dt.dataaa.PropertyType
+
+        //display the listing type
+        $("#inputState").val(dt.dataaa.ListingType);
+        vm.property.ListingType = dt.dataaa.ListingType
+
+        //display the location
+        $("#location").val(dt.dataaa.Location);
+        vm.property.Location = dt.dataaa.Location
+
+        //display th bathrooms
+        $("#bth").val(dt.dataaa.Bathrooms);
+        vm.property.Bathrooms = dt.dataaa.Bathrooms
+
+        //display the bedrooms
+        $("#bedrooms").val(dt.dataaa.Bedrooms);
+        vm.property.Bedrooms = dt.dataaa.Bedrooms
+
+        //display the rent price
+        $("#rent").val(dt.dataaa.ListingPrice);
+        vm.property.ListingPrice = dt.dataaa.ListingPrice
+
+        //display the parking
+        $("#parking").val(dt.dataaa.Parking);
+        vm.property.Parking = dt.dataaa.Parking
+
+        //display the apartment square foot
+        $("#sqft").val(dt.dataaa.BuildingSqft);
+        vm.property.BuildingSqft = dt.dataaa.BuildingSqft
+
+        //display the listing description
+        $("#exampleFormControlTextarea1").val(dt.dataaa.ListingDescription);
+        vm.property.description = dt.dataaa.ListingDescription
+
+        //check for amenities
+        if (am.DishWasher) {
+          $("#d").prop("checked", true);
+          vm.amenities.DishWasher = am.DishWasher
+        }
+
+        if(am.SecurityCameras){
+          $("#sc").prop("checked", true);
+          vm.amenities.SecurityCameras = am.SecurityCameras
+        }
+        if (am.Elevetor) {
+          $("#e").prop("checked", true);
+          vm.amenities.Elevator = am.Elevetor
+        }
+        if (am.Garage) {
+          $("#g").prop("checked", true);
+          vm.amenities.garage = am.Garage
+        }
+        if (am.Internet) {
+          $("#i").prop("checked", true);
+          vm.amenities.Internet = am.Internet
+        }
+        if (am.Jacuzzi) {
+          $("#j").prop("checked", true);
+          vm.amenities.Jacuzzi = am.Jacuzzi
+        }
+        if (am.Laundry) {
+          $("#l").prop("checked", true);
+          vm.amenities.Laundry = am.Laundry
+        }
+        if (am.Outdoor) {
+          $("#o").prop("checked", true);
+          vm.amenities.outdoor = am.Outdoor
+        }
+        if (am.Pets) {
+          $("#p").prop("checked", true);
+          vm.amenities.Pets = am.Pets
+        }
+        if (am.Pool) {
+          $("#po").prop("checked", true);
+          vm.amenities.pool = am.Pool
+        }
+        if (am.Solar) {
+          $("#so").prop("checked", true);
+          vm.amenities.solar = am.Solar
+        }
+        if (am.Vigilance) {
+          $("#v").prop("checked", true);
+          vm.amenities.vigilance = am.Vigilance
+        }
+      });
+
+
+      //when user clicks update this listing
+       //when user clicks submit my property
+    $("#sbtf").on("click", () => {
+      $(".error").html("");
+      $(".error2").html("");
+      $(".error1").html("");
+
+      //------------------validate property info-------------
+
+      //check to see if property info is filled out
+      if (!vm.property) {
+        $(".error2").html("Please fill out your property information below.");
+        return;
+      }
+
+      //if property title is not filled out
+      if (!vm.property.Title) {
+        $(".error2").html("Please fill out your property title below.");
+        return;
+      }
+
+      //if property type is not filled
+      if (!vm.property.PropertyType) {
+        $(".error2").html("Please select your property type below.");
+        return;
+      }
+
+      //if property listing is not selected
+      if (!vm.property.ListingType) {
+        $(".error2").html("Please select your listing type below.");
+        return;
+      }
+
+      //if property location is not filled
+      if (!vm.property.Location) {
+        $(".error2").html("Please fill out your property Location below.");
+        return;
+      }
+
+      //if number of bathrooms is not filled
+      if (!vm.property.Bathrooms) {
+        $(".error2").html(
+          "Fill out the number of bathrooms in the property below."
+        );
+        return;
+      }
+
+      //if number of bedrooms is not filled
+      if (!vm.property.Bedrooms) {
+        $(".error2").html("Please fill out the number of bedrooms below.");
+        return;
+      }
+
+      //if listing price is missing
+      if (!vm.property.ListingPrice) {
+        $(".error2").html("Please fill out your Listing price below.");
+        return;
+      }
+
+      //if parking info is missing
+      if (!vm.property.Parking) {
+        $(".error2").html("Please fill out the parking information below.");
+        return;
+      }
+
+      //if building sqft is missing
+      if (!vm.property.BuildingSqft) {
+        $(".error2").html(
+          "Please fill out your property SQFT information below."
+        );
+        return;
+      }
+
+      //if property description is missing
+      if (!vm.property.description) {
+        $(".error2").html("Please fill out the property description below.");
+        return;
+      }
+
+      //chek if there are images
+      if (myFiles.length == 0) {
+        $(".error1").html("Please upload images of your property.");
+        return;
+      }
+
+      $("#sbtf").html("");
+      $("#sbtf").css("color: white");
+      $(
+        '<div class="spinner-border" role="status" >' +
+          '<span class="sr-only">Loading...</span>' +
+          "</div>"
+      ).appendTo("#sbtf");
+
+      var formData = new FormData();
+
+      const token = $window.localStorage.token;
+      const payload = jwtHelper.decodeToken(token).data;
+      var email = payload.Email;
+
+      // Append each file to the FormData object
+      for (var i = 0; i < myFiles.length; i++) {
+        formData.append(email + "," + vm.property.Title, myFiles[i]);
+      }
+
+      // Append other data to the FormData object
+      formData.append("user", JSON.stringify(email));
+      formData.append("property", JSON.stringify(vm.property));
+      formData.append("amenities", JSON.stringify(vm.amenities));
+
+      //send the data to the server
+      $http
+        .post("/post/upload", formData, {
+          transformRequest: angular.identity,
+          headers: { "Content-Type": undefined },
+        })
+        .then(function (response) {
+          // Handle the response
+
+          //if property is succesfully posted
+          if (response.data == "success") {
+            $("#sbtf").css("background-color", "green");
+            $("#sbtf").css("border", "none");
+            $(".spinner-border").remove();
+            $("#sbtf").html("Success");
+
+            setTimeout(function () {
+              location.href = "/properties";
+            }, 3000);
+          }
+
+          //if thei property already exists
+          if (response.data == "property already exists for this client") {
+            $("#sbtf").css("background-color", "red");
+            $("#sbtf").css("border", "none");
+            $(".spinner-border").remove();
+            $("#sbtf").html("Error");
+            $(".error1").html("This property already exists.");
+
+            setTimeout(function () {
+              $("#sbtf").html("Submit my Property");
+              $(".error").html("");
+              $(".error2").html("");
+              $(".error1").html("");
+            }, 3000);
+          }
+        })
+        .catch(function (error) {
+          // Handle the error
+        });
     });
   }
 
@@ -789,14 +1200,12 @@
 
       const token = $window.localStorage.token;
       const payload = jwtHelper.decodeToken(token).data;
-      var email = payload.Email
+      var email = payload.Email;
 
       // Append each file to the FormData object
       for (var i = 0; i < myFiles.length; i++) {
         formData.append(email + "," + vm.property.Title, myFiles[i]);
       }
-
-      
 
       // Append other data to the FormData object
       formData.append("user", JSON.stringify(email));
@@ -842,7 +1251,6 @@
         })
         .catch(function (error) {
           // Handle the error
-          console.error(error);
         });
     });
   }

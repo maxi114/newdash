@@ -49,7 +49,7 @@ const PropertySchema = new Schema({
 
     //Listing price
     ListingPrice:{
-        type: String,
+        type: Number,
         required: true,
     },
 
@@ -74,7 +74,7 @@ const PropertySchema = new Schema({
 
     //amenities
     Amenities:{
-        Outdoor:{
+        OutdoorArea:{
             type: Boolean
         },
 

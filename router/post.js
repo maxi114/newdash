@@ -33,28 +33,65 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+//edit router
+router.post("/edit", (req, res) => {
+  Property.find({ _id: req.body.id }).then((data) => {
+    res.send(data);
+  });
+});
+
 //delete route
 router.post("/delete", (req, res) => {
-  
-   //function to delete the uploaded files
-  const delfile = (data) => {
-    //loop through the uploaded files path
-    for (var i = 0; i < data.length; i++) {
-      const absolutePath = path.join(__dirname, 'public/images', data[i].Path);
-      fs.unlink("public/" + data[i].Path, (err) => {
-        if(err){
-          res.send(err)
-        }
-        else{
-          //delte data from the database
-          Image.deleteMany({ Email: data[0].Email, PropertyTile: data[0].Title })
-          .then(()=>{
-             //delete the listing from the databse
-             Property.deleteOne({ _id: req.body.id })
-             res.send("done")
-          })
-        }
+  //function to delete the uploaded files
+  async function processAndDeleteFiles(data) {
+    try {
+      // Create an array to hold promises
+      let deletePromises = [];
+
+      // Loop through the uploaded files path
+      for (var i = 0; i < data.length; i++) {
+        const filePath = "public/" + data[i].Path;
+        const deletePromise = new Promise((resolve, reject) => {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+
+        // Add the promise to the array
+        deletePromises.push(deletePromise);
+      }
+
+      // Wait for all the promises to complete
+      await Promise.all(deletePromises);
+
+      // Call the delete function after all files have been deleted
+      await dele(data);
+    } catch (error) {
+      res.send(error + " ererer");
+    }
+  }
+
+  // Delete function
+  async function dele( data) {
+    try {
+      // Delete data from the database
+      await Image.deleteMany({
+        Email: data[0].Email,
+        PropertyTile: data[0].Title,
       });
+
+      // Delete the listing from the database
+      Property.deleteOne({ _id: req.body.id })
+      .then((data)=>{
+       res.send("done " + data)
+      })
+
+    } catch (error) {
+      res.send(error + " ffefef");
     }
   }
 
@@ -65,8 +102,8 @@ router.post("/delete", (req, res) => {
         //find images with the same email and title
         Image.find({ Email: data[0].Email, PropertyTile: data[0].Title }).then(
           (data) => {
-              //delte the file path 
-              delfile(data)
+            //delte the file path
+            processAndDeleteFiles(data);
           }
         );
       } else {
@@ -363,9 +400,9 @@ router.post("/upload", upload.any(), (req, res) => {
 
     //check if property provides amenities
     if (amenities.outdoor) {
-      propertyy.Amenities.Outdoor = true;
+      propertyy.Amenities.OutdoorArea = true;
     } else {
-      propertyy.Amenities.Outdoor = false;
+      propertyy.Amenities.OutdoorArea = false;
     }
 
     //if statement for pool
@@ -391,9 +428,9 @@ router.post("/upload", upload.any(), (req, res) => {
 
     //if statement for security cameras
     if (amenities.SecurityCameras) {
-      propertyy.Amenities.SecurityCamera = true;
+      propertyy.Amenities.SecurityCameras = true;
     } else {
-      propertyy.Amenities.SecurityCamera = false;
+      propertyy.Amenities.SecurityCameras = false;
     }
 
     //if statement for pets
