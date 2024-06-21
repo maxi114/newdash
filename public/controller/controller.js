@@ -334,12 +334,18 @@
 
   //Edit controller
   app.controller("EditController", EditController);
-  function EditController($location, $scope, $window, $http) {
+  function EditController($location, $scope, $window, $http,jwtHelper) {
     var vm = this;
 
     //retrive token from the url
     const url = window.location.pathname.split("/");
     const url2 = url[2];
+
+    //var array to store the images
+    var myFiles = [];
+
+    //store the original title
+    var tl ;
 
     //route to retrieve the property
     $http
@@ -354,9 +360,6 @@
         vm.property = dt
         vm.amenities = am
        
-        //var array to store the images
-        var myFiles = [];
-
         //display the images
         //preview pictures before uploading
         if (window.File && window.FileList && window.FileReader) {
@@ -477,7 +480,9 @@
           alert("Your browser doesn't support to File API");
         }
 
-        
+        //store the original title
+        tl = dt.dataaa.Title
+
         //display the title
         $("#title").val(dt.dataaa.Title);
         vm.property.Title = dt.dataaa.Title
@@ -676,17 +681,21 @@
       }
 
       // Append other data to the FormData object
+      formData.append("tl", JSON.stringify(tl));
       formData.append("user", JSON.stringify(email));
       formData.append("property", JSON.stringify(vm.property));
       formData.append("amenities", JSON.stringify(vm.amenities));
 
       //send the data to the server
       $http
-        .post("/post/upload", formData, {
+        .post("/post/update", formData, {
           transformRequest: angular.identity,
           headers: { "Content-Type": undefined },
         })
         .then(function (response) {
+
+          console.log(response.data)
+          return;
           // Handle the response
 
           //if property is succesfully posted

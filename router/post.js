@@ -9,7 +9,7 @@ const multer = require("multer");
 const path = require("path");
 
 //require fs to delete uploaded files
-const fs = require("fs");
+const fs = require("fs").promises;
 
 //require the client, image & property models
 const Client = require("../models/user");
@@ -76,7 +76,7 @@ router.post("/delete", (req, res) => {
   }
 
   // Delete function
-  async function dele( data) {
+  async function dele(data) {
     try {
       // Delete data from the database
       await Image.deleteMany({
@@ -85,11 +85,9 @@ router.post("/delete", (req, res) => {
       });
 
       // Delete the listing from the database
-      Property.deleteOne({ _id: req.body.id })
-      .then((data)=>{
-       res.send("done " + data)
-      })
-
+      Property.deleteOne({ _id: req.body.id }).then((data) => {
+        res.send("done " + data);
+      });
     } catch (error) {
       res.send(error + " ffefef");
     }
@@ -350,6 +348,205 @@ router.post("/properties", (req, res) => {
 
     getdata();
   });
+});
+
+//route to update the page
+router.post("/update", upload.any(), (req, res) => {
+  const dt = JSON.parse(req.body.property);
+  const am = JSON.parse(req.body.amenities);
+  const user = JSON.parse(req.body.user);
+  const tl = JSON.parse(req.body.tl);
+  const title = dt.Title;
+
+  //function to save the images information
+  const imageinfo = async () => {
+    // Access the uploaded files using req.files
+    const uploadedFiles = req.files;
+
+    // Store the path of the uploaded files in case of deletion
+    var upfiles = [];
+
+    // Loop through the uploaded files and get their path
+    for (var i = 0; i < uploadedFiles.length; i++) {
+      var filepath = uploadedFiles[i].path.split("\\").slice(1).join("/");
+      upfiles.push(filepath);
+    }
+
+    // Find images to delete
+    const data = await Image.find({ Email: user, PropertyTile: tl });
+
+    // Delete the images' files from the file system
+    await Promise.all(
+      data.map(async (image) => {
+        try {
+          await fs.unlink("public/"+image.Path);
+        } catch (err) {
+          console.error(`Error deleting image file ${image.Path}:`, err);
+        }
+      })
+    );
+
+    // Delete the image records from the database
+    await Image.deleteMany({ Email: user, PropertyTile: tl });
+
+    // Loop through the uploaded images and save new records
+    const imagePromises = uploadedFiles.map((file, i) => {
+      const image = new Image({
+        Email: user,
+        PropertyTile: title,
+        Path: upfiles[i],
+        Filename: file.filename,
+      });
+
+       image.save();
+       
+    });
+
+    await Promise.all(imagePromises);
+
+    res.send("done")
+  };
+
+  //object to set the new values
+  const newValues = {};
+  newValues.Amenities = {};
+
+  newValues.Title = dt.Title;
+  newValues.PropertyType = dt.PropertyType;
+  newValues.ListingType = dt.ListingType;
+  newValues.Location = dt.Location;
+  newValues.Bahrooms = dt.Bathrooms;
+  newValues.Bedrooms = dt.Bedrooms;
+  newValues.ListingPrice = dt.ListingPrice;
+  newValues.Parking = dt.Parking;
+  newValues.BuildingSqft = dt.BuildingSqft;
+  newValues.ListingDescription = dt.description;
+
+  //check if property provides amenities
+  if (am.outdoor) {
+    newValues.Amenities.OutdoorArea = true;
+  } else {
+    newValues.Amenities.OutdoorArea = false;
+  }
+
+  //if statement for pool
+  if (am.pool) {
+    newValues.Amenities.Pool = true;
+  } else {
+    newValues.Amenities.Pool = false;
+  }
+
+  //if statement for vigilance
+  if (am.vigilance) {
+    newValues.Amenities.Vigilance = true;
+  } else {
+    newValues.Amenities.Vigilance = false;
+  }
+
+  //if statement for laundry
+  if (am.Laundry) {
+    newValues.Amenities.Laundry = true;
+  } else {
+    newValues.Amenities.Laundry = false;
+  }
+
+  //if statement for security cameras
+  if (am.SecurityCameras) {
+    newValues.Amenities.SecurityCameras = true;
+  } else {
+    newValues.Amenities.SecurityCameras = false;
+  }
+
+  //if statement for pets
+  if (am.Pets) {
+    newValues.Amenities.Pets = true;
+  } else {
+    newValues.Amenities.Pets = false;
+  }
+
+  //if statement for dishwasher
+  if (am.DishWasher) {
+    newValues.Amenities.DishWasher = true;
+  } else {
+    newValues.Amenities.DishWasher = false;
+  }
+
+  //if statement for Internet
+  if (am.Internet) {
+    newValues.Amenities.Internet = true;
+  } else {
+    newValues.Amenities.Internet = false;
+  }
+
+  //if statement for Elevator
+  if (am.Elevator) {
+    newValues.Amenities.Elevator = true;
+  } else {
+    newValues.Amenities.Elevator = false;
+  }
+
+  //if statement for Jacuzzi
+  if (am.Jacuzzi) {
+    newValues.Amenities.Jacuzzi = true;
+  } else {
+    newValues.Amenities.Jacuzzi = false;
+  }
+
+  //if statement for solar
+  if (am.solar) {
+    newValues.Amenities.Solar = true;
+  } else {
+    newValues.Amenities.Solar = false;
+  }
+
+  //if statement for garage
+  if (am.garage) {
+    newValues.Amenities.Garage = true;
+  } else {
+    newValues.Amenities.Garage = false;
+  }
+
+  //find the property
+  Property.find({ Email: user, Title: tl })
+    .then((data) => {
+      //chek to see if the tiles match
+      if (data[0].Title == title) {
+        //call the update function
+        Property.findOneAndUpdate(
+          { Email: user, Title: tl },
+          { $set: newValues },
+          { new: true, runValidators: true }
+        ).then((updatedListing) => {
+
+          imageinfo()
+        });
+      } else {
+        //check it the new title already exists
+        Property.find({ Email: user, Title: title }).then((data) => {
+          //if there is data
+          if (data.length !== 0) {
+            
+            res.send("Property with this title already exists");
+          } else {
+            //call the update function
+            Property.findOneAndUpdate(
+              { Email: user, Title: tl },
+              { $set: newValues },
+              { new: true, runValidators: true }
+            ).then((updatedListing) => {
+              imageinfo()
+            });
+          }
+        });
+      }
+    })
+    .catch((error) => {
+      // Handle any errors that occur during the find operation
+      console.error("Error finding property:", error);
+      res
+        .status(500)
+        .send({ error: "An error occurred while finding the property" });
+    });
 });
 
 //route to upload the property information
