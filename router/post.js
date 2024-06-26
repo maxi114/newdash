@@ -42,6 +42,7 @@ router.post("/edit", (req, res) => {
 
 //delete route
 router.post("/delete", (req, res) => {
+
   //function to delete the uploaded files
   async function processAndDeleteFiles(data) {
     try {
@@ -65,11 +66,8 @@ router.post("/delete", (req, res) => {
         deletePromises.push(deletePromise);
       }
 
-      // Wait for all the promises to complete
-      await Promise.all(deletePromises);
-
       // Call the delete function after all files have been deleted
-      await dele(data);
+      dele(data);
     } catch (error) {
       res.send(error + " ererer");
     }
@@ -78,11 +76,15 @@ router.post("/delete", (req, res) => {
   // Delete function
   async function dele(data) {
     try {
-      // Delete data from the database
-      await Image.deleteMany({
-        Email: data[0].Email,
-        PropertyTile: data[0].Title,
-      });
+      for (var i = 0; i < data.length; i++) {
+        // Delete data from the database
+        await Image.deleteOne({
+          Email: data[i].Email,
+          PropertyTile: data[i].PropertyTile,
+        }).then((data)=>{
+        })
+
+      }
 
       // Delete the listing from the database
       Property.deleteOne({ _id: req.body.id }).then((data) => {
@@ -306,49 +308,50 @@ router.post("/filter", (req, res) => {
   });
 });
 
-//route to fetch all the uploaded properties
+// route to fetch all the uploaded properties
 router.post("/properties", (req, res) => {
-  //array to store the data and images path
-  const dat = [];
-
-  //function to get all the images path
-  const images = async (email, title, dataa, length, p) => {
-    //store the data along with its pictures
+  // function to get all the images path
+  const getImages = async (email, title) => {
     const datta = {
       dataaa: {},
       filepath: [],
     };
 
-    //find images with the same email and title
-    Image.find({ Email: email, PropertyTile: title }).then((data) => {
-      //loop through the data
-      for (var i = 0; i < data.length; i++) {
-        datta.dataaa = dataa;
-        datta.filepath.push(data[i].Path);
-      }
+    // find images with the same email and title
+    const images = await Image.find({ Email: email, PropertyTile: title });
 
-      //push the datta to dat
-      dat.push(datta);
-
-      if (p + 1 == length) {
-        res.send(dat);
-      }
+    images.forEach(image => {
+      datta.filepath.push(image.Path);
     });
+
+    return datta;
   };
 
-  //get all the properties from the data base
-  Property.find({}).then((data) => {
-    const getdata = async () => {
-      //loop through the data
-      for (var i = 0; i < data.length; i++) {
-        //console.log("Emiail: " + data[i].Email + " PropertyTitlte: " + data[i].Title)
-        await images(data[i].Email, data[i].Title, data[i], data.length, i);
-      }
-    };
+  // get all the properties from the database
+  Property.find({}).then(async (properties) => {
+    if (properties.length === 0) {
+      return res.send("nothing");
+    }
 
-    getdata();
+    const dat = [];
+
+    // create an array of promises to get all images for each property
+    const promises = properties.map(async (property) => {
+      const datta = await getImages(property.Email, property.Title);
+      datta.dataaa = property;
+      dat.push(datta);
+    });
+
+    // wait for all promises to resolve
+    await Promise.all(promises);
+
+    // send the response after all promises have resolved
+    res.send(dat);
+  }).catch((err) => {
+    res.status(500).send(err.message);
   });
 });
+
 
 //route to update the page
 router.post("/update", upload.any(), (req, res) => {
@@ -379,7 +382,7 @@ router.post("/update", upload.any(), (req, res) => {
     await Promise.all(
       data.map(async (image) => {
         try {
-          await fs.unlink("public/"+image.Path);
+          await fs.unlink("public/" + image.Path);
         } catch (err) {
           console.error(`Error deleting image file ${image.Path}:`, err);
         }
@@ -387,7 +390,10 @@ router.post("/update", upload.any(), (req, res) => {
     );
 
     // Delete the image records from the database
-    await Image.deleteMany({ Email: user, PropertyTile: tl });
+    await Image.deleteMany({ Email: user, PropertyTile: tl })
+    .then((data)=>{
+      console.log(data)
+    })
 
     // Loop through the uploaded images and save new records
     const imagePromises = uploadedFiles.map((file, i) => {
@@ -398,13 +404,12 @@ router.post("/update", upload.any(), (req, res) => {
         Filename: file.filename,
       });
 
-       image.save();
-       
+      image.save();
     });
 
     await Promise.all(imagePromises);
 
-    res.send("done")
+    res.send("done");
   };
 
   //object to set the new values
@@ -517,15 +522,13 @@ router.post("/update", upload.any(), (req, res) => {
           { $set: newValues },
           { new: true, runValidators: true }
         ).then((updatedListing) => {
-
-          imageinfo()
+          imageinfo();
         });
       } else {
         //check it the new title already exists
         Property.find({ Email: user, Title: title }).then((data) => {
           //if there is data
           if (data.length !== 0) {
-            
             res.send("Property with this title already exists");
           } else {
             //call the update function
@@ -534,7 +537,7 @@ router.post("/update", upload.any(), (req, res) => {
               { $set: newValues },
               { new: true, runValidators: true }
             ).then((updatedListing) => {
-              imageinfo()
+              imageinfo();
             });
           }
         });

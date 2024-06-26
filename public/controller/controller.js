@@ -42,6 +42,9 @@
       templateUrl: "./signlogin.html",
       controller: "signloginController",
       controllerAs: "vm",
+      access: {
+        restricted: false,
+      },
     });
 
     //about page
@@ -76,6 +79,9 @@
       templateUrl: "./propertty.html",
       controller: "ProperttyController",
       controllerAs: "vm",
+      access: {
+        restricted: false,
+      },
     });
 
     //edit page
@@ -86,69 +92,6 @@
       access: {
         restricted: true,
       },
-    });
-
-    //our agents page
-    $routeProvider.when("/agent", {
-      templateUrl: "./agent.html",
-      controller: "AgentController",
-      controllerAs: "vm",
-    });
-
-    //toms page
-    $routeProvider.when("/tom/001", {
-      templateUrl: "./tom.html",
-      controller: "TomController",
-      controllerAs: "vm",
-    });
-
-    //chris page
-    $routeProvider.when("/chris/002", {
-      templateUrl: "./chris.html",
-      controller: "ChrisController",
-      controllerAs: "vm",
-    });
-
-    //sam page
-    $routeProvider.when("/sam/003", {
-      templateUrl: "./sam.html",
-      controller: "SamController",
-      controllerAs: "vm",
-    });
-
-    //scarlett page
-    $routeProvider.when("/scarlett/004", {
-      templateUrl: "./scarlett.html",
-      controller: "ScarlettController",
-      controllerAs: "vm",
-    });
-
-    //steve page
-    $routeProvider.when("/steve/005", {
-      templateUrl: "./steve.html",
-      controller: "SteveController",
-      controllerAs: "vm",
-    });
-
-    //will page
-    $routeProvider.when("/will/006", {
-      templateUrl: "./will.html",
-      controller: "WillController",
-      controllerAs: "vm",
-    });
-
-    //conact page
-    $routeProvider.when("/contact", {
-      templateUrl: "./contact.html",
-      controller: "ContactController",
-      controllerAs: "vm",
-    });
-
-    //404 page
-    $routeProvider.when("/error", {
-      templateUrl: "./404.html",
-      controller: "ErrorController",
-      controllerAs: "vm",
     });
   });
 
@@ -167,20 +110,17 @@
         if (p == 0) {
           //store the images in an array
           images.push(
-            '<div class="carousel-item active">' +
-              '<img src="./' +
-              data[i].filepath[p] +
-              '" class="d-block w-100" alt="...">' +
-              "</div>"
+            '<div class="carousel-item active" w-100 id="imggg" style="background-image: url(\'./' + data[i].filepath[p] + '\'); background-size: cover; background-position: center;">' +
+              
+              '</div>'
+
           );
         } else {
           //store the images in an array
           images.push(
-            '<div class="carousel-item">' +
-              '<img src="./' +
-              data[i].filepath[p] +
-              '" class="d-block w-100" alt="...">' +
-              "</div>"
+             '<div class="carousel-item w-100" id="imggg" style="background-image: url(\'./' + data[i].filepath[p] + '\'); background-size: cover; background-position: center;">' +
+              
+              '</div>'
           );
         }
 
@@ -194,11 +134,11 @@
         '<div class = "hld" id=' +
           data[i].dataaa._id +
           ">" +
-          '<div class ="card" style ="width: 100%; border: none;" >' +
+          '<div class ="card" style ="width: 100%; border: none; " >' +
           '<div id="carouselExampleIndicators' +
           i +
           '" class="carousel slide">' +
-          '<div class="card-img-top carousel-inner">' +
+          '<div class="card-img-top carousel-inner" id="imgt" >' +
           images +
           "</div>" +
           "</div>" +
@@ -226,15 +166,15 @@
           "</p>" +
           '<div class="line3"></div>' +
           "<br>" +
-          ' <div class="card-body row align-items-center" id = "idem" style = "margin-left: 3px" >' +
-          '<div class="card-link crdde3" style=" margin-right: 30px">' +
+          ' <div class="card-body row align-items-center" id = "idem" style = "" >' +
+          ' <div class="card-body row align-items-center" id = "idem" style = "" >' +
+          '<div class="card-link crdde3" >' +
           '<p class = "linktxt previ"> Preview </p>' +
           "</div>" +
-          ' <div class="card-body row align-items-center" id = "idem" style = "margin-left: 3px" >' +
-          '<div class="card-link crdde" style=" margin-right: 30px">' +
+          '<div class="card-link crdde " style="">' +
           '<p class = "linktxt dele"> Delete </p>' +
           "</div>" +
-          '<div class="card-link " id="edi>' +
+          '<div class="card-link " id="edi">' +
           '<img src="./images/edit.png" class = "linkimg linkimg1" alt="" srcset="">' +
           '<p class = "linktxt editt"> Edit </p>' +
           "</div>" +
@@ -249,19 +189,43 @@
 
     //when user clicks the properties
     $(".previ").click(function () {
-      var pr = $(this).parents("div")[3].id;
+      var pr = $(this).parents("div")[4].id;
+
       location.href = "propertty/" + pr;
     });
 
     //when user clicks delete
     $(".dele").click(function () {
+      var bt2 = $(this).parents("div")[0]
+      var bt = $(this)
+      $(bt).html("");
+      $(bt).css("color: white");
+      $(
+        '<div class="spinner-border" role="status" >' +
+          '<span class="sr-only">Loading...</span>' +
+          "</div>"
+      ).appendTo(bt);
+      
+      var pr2 = $(this).parents("div")[4]
       var pr = $(this).parents("div")[4].id;
       $http
         .post("/post/delete", {
           id: pr,
         })
         .then((res) => {
-          console.log(res);
+          $(bt).html("");
+          $(bt).css("color: white");
+          $(bt2).css({
+            "background-color": "green"
+        });
+          $(bt).html("Done");
+
+          setTimeout(function() {
+            $(pr2).remove()
+            // Code to execute after the delay
+        }, 1000);
+
+        
         });
     });
 
@@ -308,7 +272,13 @@
     });
 
     //when user clicks login
-    $(".loginn").on("click", () => {
+    $(".loginn").click(function () {
+      $(".erro").html("")
+
+      if(!vm.login){
+        console.log("nothing")
+        return;
+      }
       if (!vm.login.email) {
         console.log("no email");
         return;
@@ -318,12 +288,28 @@
         console.log("no password");
         return;
       }
+
+      var bt = $(this)
+      $(bt).html("");
+      $(bt).css("color: white");
+      $(
+        '<div class="spinner-border" role="status" >' +
+          '<span class="sr-only">Loading...</span>' +
+          "</div>"
+      ).appendTo(bt)
+
       $http.post("/api/login", vm.login).then((res) => {
         //if successful
         if (res.data == "wrong password or email") {
+          $(bt).html("");
+          $(bt).html("Login");
+          $(".erro").html("wrong password or email")
         }
 
         if (res.data == "user does not exists") {
+          $(bt).html("");
+          $(bt).html("Login");
+          $(".erro").html("wrong password or email")
         } else {
           $window.localStorage.token = res.data;
           $location.path("/post");
@@ -694,12 +680,8 @@
         })
         .then(function (response) {
 
-          console.log(response.data)
-          return;
-          // Handle the response
-
           //if property is succesfully posted
-          if (response.data == "success") {
+          if (response.data == "done") {
             $("#sbtf").css("background-color", "green");
             $("#sbtf").css("border", "none");
             $(".spinner-border").remove();
@@ -707,23 +689,23 @@
 
             setTimeout(function () {
               location.href = "/properties";
-            }, 3000);
+            }, 1000);
           }
 
           //if thei property already exists
-          if (response.data == "property already exists for this client") {
+          if (response.data == "Property with this title already exists") {
             $("#sbtf").css("background-color", "red");
             $("#sbtf").css("border", "none");
             $(".spinner-border").remove();
             $("#sbtf").html("Error");
-            $(".error1").html("This property already exists.");
+            $(".error1").html("Property with the abpve title already exists.");
 
             setTimeout(function () {
-              $("#sbtf").html("Submit my Property");
+              $("#sbtf").html("Update this listing");
               $(".error").html("");
               $(".error2").html("");
               $(".error1").html("");
-            }, 3000);
+            }, 1000);
           }
         })
         .catch(function (error) {
@@ -735,60 +717,6 @@
   //about controller
   app.controller("AboutController", AboutController);
   function AboutController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //contact controller
-  app.controller("ContactController", ContactController);
-  function ContactController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //Error controller
-  app.controller("ErrorController", ErrorController);
-  function ErrorController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //agent controller
-  app.controller("AgentController", AgentController);
-  function AgentController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //chris controller
-  app.controller("ChrisController", ChrisController);
-  function ChrisController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //Sam controller
-  app.controller("SamController", SamController);
-  function SamController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //Scarlett controller
-  app.controller("ScarlettController", ScarlettController);
-  function ScarlettController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //steve controller
-  app.controller("SteveController", SteveController);
-  function SteveController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //will controller
-  app.controller("WillController", WillController);
-  function WillController($location, $scope, $window, $http) {
-    var vm = this;
-  }
-
-  //Tom controller
-  app.controller("TomController", TomController);
-  function TomController($location, $scope, $window, $http) {
     var vm = this;
   }
 
@@ -807,7 +735,6 @@
         id: url2,
       })
       .then((response) => {
-        console.log(response.data);
         if (response.data == "nothing") {
           $location.path("/error");
         } else {
@@ -907,119 +834,21 @@
   function PropertyController($location, $scope, $window, $http) {
     var vm = this;
 
-    //when user clicks the property filter
-    $(".pll").on("change", function () {
-      $(".spinner-border").show();
-      $(".hld").remove();
-      $("#nod").hide();
-      var pr = this.value;
-
-      var pr2 = $(".pl").val();
-
-      if (pr2 == "") {
-        $http
-          .post("/post/filter", {
-            fil: pr,
-          })
-          .then((response) => {
-            if (response.data == "nothing") {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").show();
-            } else {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").hide();
-              //showcase the properties
-              propertiess(response, $http);
-            }
-          });
-      } else {
-        $http
-          .post("/post/filter2", {
-            fil: pr,
-            fil2: pr2,
-          })
-          .then((response) => {
-            if (response.data == "nothing") {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").show();
-            } else {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").hide();
-              //showcase the properties
-              propertiess(response, $http);
-            }
-          });
-      }
-    });
-
-    //when user clicks the listing type filter
-    $(".pl").on("change", function () {
-      $(".spinner-border").show();
-      $(".hld").remove();
-      $("#nod").hide();
-
-      var ch = this.value;
-
-      var ch2 = $(".pll").val();
-
-      if (ch2 == "") {
-        $http
-          .post("/post/filterr", {
-            fil: ch,
-          })
-          .then((response) => {
-            if (response.data == "nothing") {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").show();
-            } else {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").hide();
-              //showcase the properties
-              propertiess(response, $http);
-            }
-          });
-      } else {
-        $http
-          .post("/post/filter2", {
-            fil: ch2,
-            fil2: ch,
-          })
-          .then((response) => {
-            if (response.data == "nothing") {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").show();
-            } else {
-              $(".spinner-border").hide();
-              $(".hld").remove();
-              $("#nod").hide();
-              //showcase the properties
-              propertiess(response, $http);
-            }
-          });
-      }
-    });
-
     //route to get all the properties from the database
     $http
       .post("/post/properties", {
         DataSend: "get posted properties",
       })
       .then((response) => {
-        if (response.data.length > 0) {
+        if (response.data !== "nothing") {
           $(".spinner-border").hide();
           $(".hld").remove();
           //showcase the properties
           propertiess(response, $http);
         } else {
-          $(".hld").remove();
-          $("#nod").show();
+          $(".spinner-border").hide();
+         $(".hld").remove();
+          $(".nodd").html("Your listings will be shown here");
         }
       });
   }
@@ -1239,7 +1068,7 @@
 
             setTimeout(function () {
               location.href = "/properties";
-            }, 3000);
+            }, 1000);
           }
 
           //if thei property already exists

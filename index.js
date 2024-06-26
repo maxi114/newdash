@@ -26,7 +26,7 @@ app.use('/post', router);
 app.use('/api', routerr);
 
 // Database connection string
-const db = `mongodb+srv://pro:${process.env.MongoPwd}@mycluster.pbbtvdv.mongodb.net/estatpro`;
+const db = `mongodb+srv://pro:${process.env.MongoPwd}@mycluster.pbbtvdv.mongodb.net/AgentPortal`;
 
 // Connect to database
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
