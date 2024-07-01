@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv"); //store the secret
 const mongoose = require("mongoose");
 const multer = require("multer");
+const cloudinary = require("cloudinary");
 
 //require path
 const path = require("path");
@@ -42,7 +43,6 @@ router.post("/edit", (req, res) => {
 
 //delete route
 router.post("/delete", (req, res) => {
-
   //function to delete the uploaded files
   async function processAndDeleteFiles(data) {
     try {
@@ -81,9 +81,7 @@ router.post("/delete", (req, res) => {
         await Image.deleteOne({
           Email: data[i].Email,
           PropertyTile: data[i].PropertyTile,
-        }).then((data)=>{
-        })
-
+        }).then((data) => {});
       }
 
       // Delete the listing from the database
@@ -320,7 +318,7 @@ router.post("/properties", (req, res) => {
     // find images with the same email and title
     const images = await Image.find({ Email: email, PropertyTile: title });
 
-    images.forEach(image => {
+    images.forEach((image) => {
       datta.filepath.push(image.Path);
     });
 
@@ -328,30 +326,31 @@ router.post("/properties", (req, res) => {
   };
 
   // get all the properties from the database
-  Property.find({}).then(async (properties) => {
-    if (properties.length === 0) {
-      return res.send("nothing");
-    }
+  Property.find({})
+    .then(async (properties) => {
+      if (properties.length === 0) {
+        return res.send("nothing");
+      }
 
-    const dat = [];
+      const dat = [];
 
-    // create an array of promises to get all images for each property
-    const promises = properties.map(async (property) => {
-      const datta = await getImages(property.Email, property.Title);
-      datta.dataaa = property;
-      dat.push(datta);
+      // create an array of promises to get all images for each property
+      const promises = properties.map(async (property) => {
+        const datta = await getImages(property.Email, property.Title);
+        datta.dataaa = property;
+        dat.push(datta);
+      });
+
+      // wait for all promises to resolve
+      await Promise.all(promises);
+
+      // send the response after all promises have resolved
+      res.send(dat);
+    })
+    .catch((err) => {
+      res.status(500).send(err.message);
     });
-
-    // wait for all promises to resolve
-    await Promise.all(promises);
-
-    // send the response after all promises have resolved
-    res.send(dat);
-  }).catch((err) => {
-    res.status(500).send(err.message);
-  });
 });
-
 
 //route to update the page
 router.post("/update", upload.any(), (req, res) => {
@@ -390,10 +389,9 @@ router.post("/update", upload.any(), (req, res) => {
     );
 
     // Delete the image records from the database
-    await Image.deleteMany({ Email: user, PropertyTile: tl })
-    .then((data)=>{
-      console.log(data)
-    })
+    await Image.deleteMany({ Email: user, PropertyTile: tl }).then((data) => {
+      console.log(data);
+    });
 
     // Loop through the uploaded images and save new records
     const imagePromises = uploadedFiles.map((file, i) => {
@@ -565,6 +563,9 @@ router.post("/upload", upload.any(), (req, res) => {
   //store the path of the uploaded files in case of deletion
   var upfiles = [];
 
+  //loop thorugh thr uploaded files
+  for (var i = 0; i < uploadedFiles.length; i++) {}
+
   //loop through the uploaded files and get their path
   for (var i = 0; i < uploadedFiles.length; i++) {
     var filepath = uploadedFiles[i].path.split("\\").slice(1).join("/");
@@ -684,19 +685,42 @@ router.post("/upload", upload.any(), (req, res) => {
   };
 
   //function to save the images information
-  const imageinfo = () => {
-    //loop through the uploaded images
-    for (var i = 0; i < uploadedFiles.length; i++) {
-      //new image upload schema
-      const image = new Image();
+  const imageinfo = async() => {
 
-      image.Email = client;
-      image.PropertyTile = property.Title;
-      image.Path = upfiles[i];
-      image.Filename = uploadedFiles[i].filename;
+     // Configuration
+  cloudinary.config({
+    cloud_name: "dlq9vid7b",
+    api_key: "727168712631784",
+    api_secret: process.env.APIFORIMAGE,
+  });
 
-      image.save();
+  // Loop through the uploaded images using an index
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    const file = uploadedFiles[i];
+
+    try {
+      // Upload an image
+      const uploadResult = await cloudinary.uploader.upload(file.path, {
+        public_id: file.filename,
+      });
+
+      // Create a new image schema instance
+      const image = new Image({
+        Email: client,
+        PropertyTile: property.Title,
+        Path: upfiles[i], // Use the index to access the correct upfile
+        Filename: file.filename,
+        Url: uploadResult.url,
+      });
+
+      // Save the image instance to the database
+      await image.save();
+
+    } catch (error) {
+      console.log('Error during image upload and save:', error);
     }
+  }
+
   };
 
   //check if property exists

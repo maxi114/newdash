@@ -757,9 +757,9 @@
 
           //check if its a home or office
           if (dat.dataaa.PropertyType.includes("Home")) {
-            $(".title").html("Home In " + dat.dataaa.Location);
+            $(".title").html("" + dat.dataaa.Location);
           } else {
-            $(".title").html("Office In " + dat.dataaa.Location);
+            $(".title").html("" + dat.dataaa.Location);
           }
 
           //render the sqft

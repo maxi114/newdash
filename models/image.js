@@ -26,6 +26,12 @@ const ImageSchema = new Schema({
         type: String,
         required: true,
         unique: true,
+    },
+
+    //path to image url
+    Url:{
+        type: String,
+        required: true,
     }
 
 })
