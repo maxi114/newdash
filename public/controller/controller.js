@@ -1045,6 +1045,10 @@
         formData.append(email + "," + vm.property.Title, myFiles[i]);
       }
 
+      if(!vm.amenities){
+        vm.amenities = "none"
+      }
+
       // Append other data to the FormData object
       formData.append("user", JSON.stringify(email));
       formData.append("property", JSON.stringify(vm.property));

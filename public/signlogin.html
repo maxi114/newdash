@@ -26,10 +26,10 @@
             <div class="signup">
                 <form>
                     <label for="chk" aria-hidden="true">Sign up</label>
-                    <input type="text" name="txt" placeholder="Name" required="">
-                    <input type="email" name="email" placeholder="Email" required="">
-                    <input type="password" name="pswd" placeholder="Password" required="">
-                    <button class="signup-btn">Sign up</button>
+                    <input type="text" name="txt" placeholder="Name" ng-model="vm.sign.name" required="">
+                    <input type="email" name="email" placeholder="Email"  ng-model="vm.sign.email" required="">
+                    <input type="password" name="pswd" placeholder="Password"  ng-model="vm.sign.password" required="">
+                    <button class="signupp">Sign up</button>
                 </form>
             </div>
         </div>
